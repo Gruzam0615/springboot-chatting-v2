@@ -20,6 +20,7 @@ const ChatRoom = (param) => {
     }
     
     const sendMessageBtn = () => {
+        publish(message);
         setMessage("");
     }
 
@@ -30,12 +31,13 @@ const ChatRoom = (param) => {
     }
 
     useEffect(() => {
-      
+      connect();
+      return () => disconnect()
     },[])
 
     const connect = () => {
         client.current = new StompJs.Client({
-            webSocketFactory: () => new SockJS("/ws-stomp/chat"),
+            webSocketFactory: () => new SockJS("/ws/chat"),
             debug: (frame) => {
                 console.log("debug");
                 console.log(frame);
@@ -44,7 +46,18 @@ const ChatRoom = (param) => {
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
             onConnect: () => {
-                subscribe();
+                // client.current.subscribe(`/topic/chat/room/${roomId}`, ({ body }) => {
+                //     setMessages((msgs) => [...msgs, JSON.parse(body)]);
+                // });
+                // client.current.publish({
+                //     destination: "/app/chat/message",
+                //     body: JSON.stringify({
+                //         "messageType": "ENTER",
+                //         "roomId": roomId,
+                //         "sender": "Admin01",
+                //         "sendDate": ""
+                //     })
+                // })
             },
             onStompError: (frame) => {
                 console.error("STOMP ERROR");
@@ -59,7 +72,7 @@ const ChatRoom = (param) => {
     };
 
     const subscribe = () => {
-        client.current.subscribe(`/topic/chat/${roomId}`, ({ body }) => {
+        client.current.subscribe(`/topic/chat/room/${roomId}`, ({ body }) => {
             setMessages((msgs) => [...msgs, JSON.parse(body)]);
         });
     };
@@ -70,12 +83,13 @@ const ChatRoom = (param) => {
         }
 
         client.current.publish({
-            destination: "/app/chat",
+            destination: "/app/chat/message",
             body: JSON.stringify({
-                roomId: {roomId},
-                sender: "Admin01",
-                message: {msg},
-                sendDate: ""
+                "messageType": "TALK",
+                "roomId": roomId,
+                "sender": "Admin01",
+                "message": msg,
+                "sendDate": ""
             })
         });
     }
@@ -83,7 +97,13 @@ const ChatRoom = (param) => {
     return(
         <div>
             <h1>채팅방 RoomId: {roomId}</h1>
-            <ul></ul>
+            <ul>
+            {
+                messages == null ?
+                null :
+                messages.map((item, index) => <li>{item.message}</li>)
+            }
+            </ul>
             <input type={"text"} value={message} onChange={onChangeMessage} />
             <input type={"button"} value="보내기" onClick={sendMessageBtn}/>
         </div>
