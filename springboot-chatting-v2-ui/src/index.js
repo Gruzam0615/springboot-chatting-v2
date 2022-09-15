@@ -1,13 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider, Routes } from 'react-router-dom';
 import './index.css';
 import Main from './main/Main';
+import ChatRoom from './chatroom/ChatRoom';
 import reportWebVitals from './reportWebVitals';
+
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Main />
+  },
+  {
+    path: "/chatRoom/:roomId",
+    element: <ChatRoom roomId/>
+  }
+]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Main />
+    <RouterProvider router={router} />
+    {/* <Main /> */}
   </React.StrictMode>
 );
 

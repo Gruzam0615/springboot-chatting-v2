@@ -3,11 +3,12 @@ import { UseTitle } from '../UseTitle';
 import './Main.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
+import { Outlet, Link } from 'react-router-dom';
 
 function Main() {
   UseTitle("채팅방 목록");
   const [ chatRoomTitleValue, setChatRoomTitleValue ] = useState("");
-  const [ chatRoomList, setChatRoomList ] = useState(null);
+  const [ chatRoomList, setChatRoomList ] = useState([]);
   
   const onChangeChatRoomTitleValue = (e) => {
     setChatRoomTitleValue(e.target.value);
@@ -15,9 +16,14 @@ function Main() {
 
   const onClickChatRoomCreateBtn = () => {
     // alert(chatRoomTitleValue);
-    requestCreateChatRoom(chatRoomTitleValue);
-    setChatRoomTitleValue("");
-    requestSelectChatRoomList();
+    if(chatRoomTitleValue == "") {
+      alert("채팅방 제목을 입력해주세요.");
+    }
+    else {
+      requestCreateChatRoom(chatRoomTitleValue);
+      setChatRoomTitleValue("");
+      requestSelectChatRoomList();
+    }    
   }
 
   const requestCreateChatRoom = (roomName) => {
@@ -46,11 +52,13 @@ function Main() {
   }
 
   useEffect(() => {
+    requestSelectChatRoomList();
   }, []);
 
   return (
     <div className="Main">
       <h1>채팅방 목록</h1>
+      <Outlet />
       <Container>
       <Row>
         <Col md={12}>
@@ -63,22 +71,24 @@ function Main() {
               onChange={onChangeChatRoomTitleValue}
             />
             <InputGroup.Text id="ChatRoomCreateBtn" onClick={onClickChatRoomCreateBtn}>만들기</InputGroup.Text>
+            {/* <InputGroup.Text id="SelectChatRoomListBtn" onClick={requestSelectChatRoomList}>조회</InputGroup.Text> */}
           </InputGroup>
         </Col>
       </Row>
-      <Row>
-        <Col md={12}>
+      </Container>
+      <div>
+        <ul>
         {
-          chatRoomList != null ?
-            chatRoomList.map((item, index) => {
-              <span>{item.roomName}</span>
-            })
-            :
-            <span>대화방이 없습니다.</span>
-        }  
-        </Col>
-      </Row>
-      </Container>         
+          chatRoomList.length == 0 ? 
+          <li id='1' key={1}>채팅방이 없습니다.</li> :
+          chatRoomList.map((item, index) =>
+            <li id={index} key={index}>
+              <Link to={`/chatRoom/${item.roomId}`}>{item.roomName}</Link>              
+            </li> 
+          )
+        }
+        </ul>
+      </div>    
     </div>
   );
 }
