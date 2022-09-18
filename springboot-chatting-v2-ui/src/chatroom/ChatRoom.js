@@ -32,7 +32,9 @@ const ChatRoom = (param) => {
 
     useEffect(() => {
       connect();
-      return () => disconnect()
+      return () => { 
+        disconnect();
+      }
     },[])
 
     const connect = () => {
@@ -46,18 +48,18 @@ const ChatRoom = (param) => {
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
             onConnect: () => {
-                // client.current.subscribe(`/topic/chat/room/${roomId}`, ({ body }) => {
-                //     setMessages((msgs) => [...msgs, JSON.parse(body)]);
-                // });
-                // client.current.publish({
-                //     destination: "/app/chat/message",
-                //     body: JSON.stringify({
-                //         "messageType": "ENTER",
-                //         "roomId": roomId,
-                //         "sender": "Admin01",
-                //         "sendDate": ""
-                //     })
-                // })
+                client.current.subscribe(`/topic/chat/room/${roomId}`, ({ body }) => {
+                    setMessages((msgs) => [...msgs, JSON.parse(body)]);
+                });
+                client.current.publish({
+                    destination: "/app/chat/message",
+                    body: JSON.stringify({
+                        "messageType": "ENTER",
+                        "roomId": roomId,
+                        "sender": "Admin01",
+                        "sendDate": ""
+                    })
+                })
             },
             onStompError: (frame) => {
                 console.error("STOMP ERROR");
