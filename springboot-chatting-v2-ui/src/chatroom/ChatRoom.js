@@ -39,6 +39,9 @@ const ChatRoom = (param) => {
 
     const connect = () => {
         client.current = new StompJs.Client({
+            // SockJS 클라이언트 측에서 웹 소켓 통신을 요청할 때
+            // ws 또는 wss 프로토콜을 사용하지 않고
+            // http 또는 https 프로토콜로 웹 소켓 통신을 가능하게 한다
             webSocketFactory: () => new SockJS("/ws/chat"),
             debug: (frame) => {
                 console.log("debug");
